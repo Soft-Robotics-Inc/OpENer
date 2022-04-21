@@ -19,6 +19,7 @@
 #include "cpf.h"
 #include "trace.h"
 #include "endianconv.h"
+#include "opener_error.h"
 
 
 /*The port to be used per default for I/O messages on UDP.*/
