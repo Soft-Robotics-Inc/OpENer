@@ -380,6 +380,21 @@ EipStatus OpenConsumingPointToPointConnection(
   { .sin_family = AF_INET, .sin_addr.s_addr = INADDR_ANY, .sin_port = htons(
       kOpenerEipIoUdpPort) };
 
+   // retrieve network adapter to bind only this one
+   struct sockaddr_in producing_address;
+   socklen_t producing_address_length = sizeof(struct sockaddr_in);
+   if(getsockname(g_current_active_tcp_socket,
+                  (struct sockaddr *) &producing_address,
+                  &producing_address_length) < 0) {
+     int error_code = GetSocketErrorNumber();
+     char *error_message = GetErrorMessage(error_code);
+     OPENER_TRACE_WARN("networkhandler: could not get sockname: %d - %s\n",
+                       error_code, error_message);
+     FreeErrorMessage(error_message);
+   } else {
+     addr.sin_addr = producing_address.sin_addr;
+   }
+
   CipUsint qos_for_socket = ConnectionObjectGetTToOPriority(connection_object);
   int socket = CreateUdpSocket(kUdpCommuncationDirectionConsuming,
                                &addr,
